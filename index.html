@@ -495,6 +495,11 @@
                             ].filter(link => link.trim() !== '')
                         };
                         
+                        // Debug: Log first league with requirements
+                        if (i === 2 && league.linkDescriptions) {
+                            console.log('League with Requirements:', league);
+                        }
+                        
                         if (league.competition && league.links.length > 0) {
                             data.push(league);
                         }
