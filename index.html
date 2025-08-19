@@ -430,16 +430,11 @@
             if (!response.ok) throw new Error('Network error');
             
             const csvText = await response.text();
-            console.log('CSV Data loaded:', csvText.substring(0, 500)); // Debug: Show first 500 chars
             allData = parseCSV(csvText);
-            console.log('Parsed data:', allData); // Debug: Show parsed data
-            console.log('First item keys:', Object.keys(allData[0] || {})); // Debug: Show column names
-            console.log('First item:', allData[0]); // Debug: Show first parsed item
         }
 
         // Parse CSV data using a more robust method
         function parseCSV(csvText) {
-            // Split into lines but handle quoted content properly
             const lines = [];
             let currentLine = '';
             let inQuotes = false;
@@ -450,16 +445,13 @@
                 
                 if (char === '"') {
                     if (inQuotes && nextChar === '"') {
-                        // Escaped quote
                         currentLine += '"';
-                        i++; // Skip next quote
+                        i++;
                     } else {
-                        // Toggle quote state
                         inQuotes = !inQuotes;
                         currentLine += char;
                     }
                 } else if (char === '\n' && !inQuotes) {
-                    // End of line outside quotes
                     if (currentLine.trim()) {
                         lines.push(currentLine);
                     }
@@ -469,7 +461,6 @@
                 }
             }
             
-            // Add last line if exists
             if (currentLine.trim()) {
                 lines.push(currentLine);
             }
@@ -477,26 +468,24 @@
             if (lines.length === 0) return [];
             
             const headers = parseCSVLine(lines[0]);
-            console.log('Headers found:', headers); // Debug headers
-            
             const data = [];
+            
             for (let i = 1; i < lines.length; i++) {
                 if (lines[i].trim()) {
                     const values = parseCSVLine(lines[i]);
-                    if (values.length >= headers.length - 5) { // Allow some missing columns
+                    if (values.length >= headers.length - 5) {
                         const row = {};
                         headers.forEach((header, index) => {
                             row[header] = values[index] ? values[index].trim().replace(/^"|"$/g, '') : '';
                         });
                         
-                        // Extract the required columns
                         const league = {
                             federation: row['federation'] || '',
                             country: row['country'] || '',
                             gender: row['gender'] || '',
                             age: row['age'] || '',
                             competition: row['name'] || '',
-                            linkDescriptions: row['Link-Beschreibung'] || '', // Column V
+                            linkDescriptions: row['Link-Beschreibung'] || '',
                             links: [
                                 row['Link #1'] || '',
                                 row['Link #2'] || '',
@@ -645,9 +634,6 @@
                         ${league.links.map((link, index) => 
                             `<a href="${link}" target="_blank" rel="noopener noreferrer" class="league-link">
                                 Link ${index + 1}
-                            </a>`
-                        ).join('')}
-                    </div>Link ${index + 1}
                             </a>`
                         ).join('')}
                     </div>
