@@ -488,15 +488,14 @@
                             gender: row['gender'] || '',
                             age: row['age'] || '',
                             competition: row['name'] || '',
-                            links: []
+                            links: [
+                                row['Link #1'] || '',
+                                row['Link #2'] || '',
+                                row['Link #3'] || '',
+                                row['Link #4'] || '',
+                                row['Link #5'] || ''
+                            ].filter(link => link.trim() !== '')
                         };
-                        
-                        // Find all Link columns
-                        headers.forEach((header, index) => {
-                            if (header === 'Link' && row[header] && row[header].trim()) {
-                                league.links.push(row[header].trim());
-                            }
-                        });
                         
                         if (league.competition && league.links.length > 0) {
                             data.push(league);
