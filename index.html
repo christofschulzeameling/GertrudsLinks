@@ -467,8 +467,9 @@
             
             if (lines.length === 0) return [];
             
-            const headers = parseCSVLine(lines[0]);
-            console.log('CSV Headers found:', headers); // Debug all headers
+            const headers = parseCSVLine(lines[0]).map(h => h.trim().replace(/\r/g, '')); // Clean headers
+            console.log('CSV Headers found (total:', headers.length, '):', headers); // Debug all headers
+            console.log('Looking for Requirements at index:', headers.indexOf('Requirements')); // Find Requirements position
             const data = [];
             
             for (let i = 1; i < lines.length; i++) {
@@ -499,7 +500,9 @@
                         // Debug: Log first few processed leagues
                         if (data.length < 3) {
                             console.log(`League ${data.length + 1}:`, league);
-                            console.log('Requirements value:', row['Requirements']);
+                            console.log('Raw row data:', row);
+                            console.log('Requirements key exists?', 'Requirements' in row);
+                            console.log('All row keys:', Object.keys(row));
                         }
                         
                         if (league.competition && league.links.length > 0) {
