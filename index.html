@@ -425,6 +425,8 @@
             console.log('CSV Data loaded:', csvText.substring(0, 500)); // Debug: Show first 500 chars
             allData = parseCSV(csvText);
             console.log('Parsed data:', allData); // Debug: Show parsed data
+            console.log('First item keys:', Object.keys(allData[0] || {})); // Debug: Show column names
+            console.log('First item:', allData[0]); // Debug: Show first parsed item
         }
 
         // Parse CSV data
