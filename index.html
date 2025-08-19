@@ -429,36 +429,74 @@
             console.log('First item:', allData[0]); // Debug: Show first parsed item
         }
 
-        // Parse CSV data
+        // Parse CSV data using a more robust method
         function parseCSV(csvText) {
-            const lines = csvText.split('\n');
-            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+            // Split into lines but handle quoted content properly
+            const lines = [];
+            let currentLine = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < csvText.length; i++) {
+                const char = csvText[i];
+                const nextChar = csvText[i + 1];
+                
+                if (char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        // Escaped quote
+                        currentLine += '"';
+                        i++; // Skip next quote
+                    } else {
+                        // Toggle quote state
+                        inQuotes = !inQuotes;
+                        currentLine += char;
+                    }
+                } else if (char === '\n' && !inQuotes) {
+                    // End of line outside quotes
+                    if (currentLine.trim()) {
+                        lines.push(currentLine);
+                    }
+                    currentLine = '';
+                } else {
+                    currentLine += char;
+                }
+            }
+            
+            // Add last line if exists
+            if (currentLine.trim()) {
+                lines.push(currentLine);
+            }
+            
+            if (lines.length === 0) return [];
+            
+            const headers = parseCSVLine(lines[0]);
+            console.log('Headers found:', headers); // Debug headers
             
             const data = [];
             for (let i = 1; i < lines.length; i++) {
                 if (lines[i].trim()) {
                     const values = parseCSVLine(lines[i]);
-                    if (values.length >= headers.length) {
+                    if (values.length >= headers.length - 5) { // Allow some missing columns
                         const row = {};
                         headers.forEach((header, index) => {
-                            row[header] = values[index] ? values[index].trim().replace(/"/g, '') : '';
+                            row[header] = values[index] ? values[index].trim().replace(/^"|"$/g, '') : '';
                         });
                         
-                        // Extract the required columns based on CSV structure
+                        // Extract the required columns
                         const league = {
                             federation: row['federation'] || '',
                             country: row['country'] || '',
                             gender: row['gender'] || '',
                             age: row['age'] || '',
-                            competition: row['name'] || '', // This is the competition name
-                            links: [
-                                row['Link'] || '',     // First Link column
-                                row['Link.1'] || '',   // Second Link column  
-                                row['Link.2'] || '',   // Third Link column
-                                row['Link.3'] || '',   // Fourth Link column
-                                row['Link.4'] || ''    // Fifth Link column
-                            ].filter(link => link.trim() !== '')
+                            competition: row['name'] || '',
+                            links: []
                         };
+                        
+                        // Find all Link columns
+                        headers.forEach((header, index) => {
+                            if (header === 'Link' && row[header] && row[header].trim()) {
+                                league.links.push(row[header].trim());
+                            }
+                        });
                         
                         if (league.competition && league.links.length > 0) {
                             data.push(league);
