@@ -407,8 +407,8 @@
         let filteredData = [];
         let currentSort = 'federation';
 
-        // Google Sheets CSV URL
-        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/17SyN5FOCuF83ddrzNb1Qh5qrXGod5ISuTAPp2dHtJi8/export?format=csv&gid=1261732416';
+        // Google Sheets CSV URL with cache buster
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/17SyN5FOCuF83ddrzNb1Qh5qrXGod5ISuTAPp2dHtJi8/export?format=csv&gid=1261732416&t=' + Date.now();
 
         // Initialize the application
         async function init() {
